@@ -1,7 +1,5 @@
-from datetime import datetime
 from pydantic import BaseModel, root_validator, Extra
-from typing import Optional
-from datetime import datetime, date
+from datetime import datetime
 
 
 class InsertDocumentModel(BaseModel, extra=Extra.forbid):
