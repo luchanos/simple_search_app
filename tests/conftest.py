@@ -2,10 +2,11 @@ import asyncio
 import os
 
 import pytest
-from httpx import AsyncClient
-from main import app
-from fastapi.testclient import TestClient
-from subprocess import Popen, PIPE
+import asyncpg
+from elasticsearch import AsyncElasticsearch, NotFoundError
+
+import settings
+from scripts.index_creation import MAPPING_FOR_INDEX
 
 
 @pytest.fixture(scope="session")
@@ -23,11 +24,31 @@ def create_database_and_run_migrations():
 
 
 @pytest.fixture(scope="session")
-async def db():
-    yield app.state.db
+async def test_db():
+    pool = await asyncpg.create_pool("postgresql://postgres:postgres@0.0.0.0:5432/postgres")
+    yield pool
+    pool.close()
+
+
+@pytest.fixture(scope="function")
+async def test_elastic():
+    test_elastic = AsyncElasticsearch(settings.TEST_ELASTIC_URL)
+    yield test_elastic
 
 
 @pytest.fixture(scope="function", autouse=True)
-async def clean_tables():
-    """Clean data in all collections before running test function"""
-    c = 1
+async def clean_tables(test_db):
+    """Clean data in all tables before running test function"""
+    async with test_db.acquire() as connection:
+        async with connection.transaction():
+            await connection.execute("""TRUNCATE TABLE documents;""")
+
+
+@pytest.fixture(scope="function", autouse=True)
+async def clean_indexes(test_elastic):
+    """Clean data in all indexes before running test function"""
+    try:
+        await test_elastic.indices.delete(index="documents")
+    except NotFoundError:
+        print("Index for deleting not found")
+    await test_elastic.indices.create(index="documents", mappings=MAPPING_FOR_INDEX)

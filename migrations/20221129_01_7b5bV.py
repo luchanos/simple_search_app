@@ -8,10 +8,11 @@ __depends__ = {}
 
 steps = [
     step("""CREATE TABLE documents (
-    id serial,
+    id serial PRIMARY KEY,
     rubrics text[],
     text text,
-    created_date date
+    created_date date,
+    is_deleted boolean
     );""",
          """DROP TABLE documents;""")
 ]

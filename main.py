@@ -5,7 +5,7 @@ from elasticsearch import AsyncElasticsearch
 
 from fastapi.routing import APIRoute, APIRouter
 
-from handlers import create_document, ping
+from handlers import create_document, ping, delete_document
 import settings
 
 
@@ -43,6 +43,7 @@ app = create_app()
 routes = [
     APIRoute(path="/ping", endpoint=ping, methods=["GET"]),
     APIRoute(path="/create_document", endpoint=create_document, methods=["POST"]),
+    APIRoute(path="/delete_document", endpoint=delete_document, methods=["DELETE"]),
 ]
 
 app.include_router(APIRouter(routes=routes))

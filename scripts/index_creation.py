@@ -8,18 +8,26 @@ ELASTIC_URL = env.str("ELASTIC_URL", default="http://0.0.0.0:9200")
 
 MAPPING_FOR_INDEX = {
             "properties": {
-                "id": {
+                "Id": {
                     "type": "long",
                 },
                 "text": {
-                    "type": "text"}
+                    "type": "text"
+                },
+                "created_date": {
+                    "type": "date"
+                },
+                "rubrics": {
+                    "type": "keyword"
                 }
-            }
+            },
+        }
 
 
-async def main():
+async def create_indexes():
     elastic_client: AsyncElasticsearch = AsyncElasticsearch(ELASTIC_URL)
     print(await elastic_client.indices.create(index="documents", mappings=MAPPING_FOR_INDEX))
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(create_indexes())
