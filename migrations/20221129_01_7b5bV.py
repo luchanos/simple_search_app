@@ -11,7 +11,7 @@ steps = [
     id serial PRIMARY KEY,
     rubrics text[],
     text text,
-    created_date date,
+    created_date timestamp,
     is_deleted boolean
     );""",
          """DROP TABLE documents;""")

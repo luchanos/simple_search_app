@@ -13,12 +13,6 @@ MAPPING_FOR_INDEX = {
                 },
                 "text": {
                     "type": "text"
-                },
-                "created_date": {
-                    "type": "date"
-                },
-                "rubrics": {
-                    "type": "keyword"
                 }
             },
         }

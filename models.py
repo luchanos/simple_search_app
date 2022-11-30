@@ -1,11 +1,11 @@
-from datetime import date
-from pydantic import BaseModel, root_validator
-from typing import Optional
 from datetime import datetime
+from pydantic import BaseModel, root_validator, Extra
+from typing import Optional
+from datetime import datetime, date
 
 
-class InsertDocumentModel(BaseModel):
-    created_date: Optional[date]
+class InsertDocumentModel(BaseModel, extra=Extra.forbid):
+    created_date: datetime
     text: str
     rubrics: list[str]
 
