@@ -15,7 +15,7 @@ async def create_document(test_db, test_elastic, document_id, rubrics, text, cre
                 text,
                 created_date)
             document_id = document_returned_data[0]["id"]
-            document = {"id": document_id, "rubrics": rubrics, "created_date": created_date, "text": text}
+            document = {"iD": document_id, "text": text}
             await test_elastic.index(index="documents", document=document)
     return document_id
 

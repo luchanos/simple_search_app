@@ -8,7 +8,7 @@ ELASTIC_URL = env.str("ELASTIC_URL", default="http://0.0.0.0:9200")
 
 MAPPING_FOR_INDEX = {
             "properties": {
-                "Id": {
+                "iD": {
                     "type": "long",
                 },
                 "text": {
