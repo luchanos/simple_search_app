@@ -50,7 +50,7 @@ async def search_documents(request: Request, text_query: str):
                                          query={"match": {"text": text_query}}, size=20)
     document_ids = [document["_source"]["iD"] for document in documents_raw.body["hits"]["hits"]]
     documents_from_db = await db.pool.fetch("""SELECT id, rubrics, text, created_date 
-    FROM documents WHERE id = any($1::int[]) AND is_deleted IS NOT TRUE;""", document_ids)
+    FROM documents WHERE id = any($1::int[]) AND is_deleted IS NOT TRUE ORDER BY created_date;""", document_ids)
     return {"success": True, "documents": [
         {"id": document["id"],
          "rubrics": document["rubrics"],

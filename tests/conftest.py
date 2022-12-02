@@ -1,11 +1,13 @@
 import asyncio
 import os
+from fastapi.testclient import TestClient
 
 import pytest
 import asyncpg
 from elasticsearch import AsyncElasticsearch, NotFoundError
 
 import settings
+from main import app
 from scripts.index_creation import MAPPING_FOR_INDEX
 
 
@@ -28,6 +30,12 @@ async def test_db():
     pool = await asyncpg.create_pool("postgresql://postgres:postgres@0.0.0.0:5432/postgres")
     yield pool
     pool.close()
+
+
+@pytest.fixture(scope="session")
+async def test_client():
+    with TestClient(app) as client:
+        yield client
 
 
 @pytest.fixture(scope="function")
