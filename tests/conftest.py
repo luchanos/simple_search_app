@@ -21,7 +21,7 @@ def event_loop():
 @pytest.fixture(scope="session", autouse=True)
 def create_database_and_run_migrations():
     print("Running migrations...")
-    os.system(f"yoyo apply --database postgresql://postgres:postgres@0.0.0.0:5432/postgres ../migrations -b")
+    os.system(f"yoyo apply --database postgresql://postgres:postgres@0.0.0.0:5432/postgres ./migrations -b")
     print("Migrations completed successfully.")
 
 
@@ -40,7 +40,7 @@ async def test_client():
 
 @pytest.fixture(scope="function")
 async def test_elastic():
-    test_elastic = AsyncElasticsearch(settings.TEST_ELASTIC_URL)
+    test_elastic = AsyncElasticsearch(settings.ELASTIC_URL)
     yield test_elastic
 
 

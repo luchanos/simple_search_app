@@ -1,27 +1,28 @@
 version: "3.0"
 services:
   elasticsearch:
-    container_name: es-container
+    container_name: "es-container"
     image: docker.elastic.co/elasticsearch/elasticsearch:8.2.3
     environment:
       - xpack.security.enabled=false
       - "discovery.type=single-node"
     networks:
-      - es-net
+      - custom
     ports:
       - "9200:9200"
   kibana:
-    container_name: kb-container
+    container_name: "kb-container"
     image: docker.elastic.co/kibana/kibana:8.2.3
     environment:
       - ELASTICSEARCH_HOSTS=http://es-container:9200
     networks:
-      - es-net
+      - custom
     depends_on:
       - elasticsearch
     ports:
       - "5601:5601"
-  postgres:
+  db:
+    container_name: "db"
     image: postgres:14.1-alpine
     restart: always
     environment:
@@ -30,6 +31,24 @@ services:
       - POSTGRES_DB=postgres
     ports:
       - '5432:5432'
+    networks:
+      - custom
+  app:
+    container_name: "app"
+    image: test_fastapi_app
+    environment:
+      - POSTGRES_DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - ELASTIC_URL=http://es-container:9200
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - custom
+    depends_on:
+      - elasticsearch
+      - db
 networks:
-  es-net:
+  custom:
     driver: bridge

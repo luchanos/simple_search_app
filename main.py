@@ -9,7 +9,10 @@ from handlers import create_document, ping, delete_document, search_documents
 import settings
 
 
-class Database():
+class Database:
+    def __init__(self):
+        self.pool = None
+
     async def create_pool(self):
         self.pool = await asyncpg.create_pool(dsn=settings.POSTGRES_DATABASE_URL)
 
@@ -51,4 +54,4 @@ app.include_router(APIRouter(routes=routes))
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, port=8000, host='127.0.0.1')
+    uvicorn.run(app, port=8000, host='0.0.0.0')
