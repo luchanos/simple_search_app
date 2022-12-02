@@ -32,24 +32,23 @@ async def test_db():
     pool.close()
 
 
-@pytest.fixture(scope="session")
-async def test_client():
-    with TestClient(app) as client:
-        yield client
-
-
 @pytest.fixture(scope="function")
 async def test_elastic():
     test_elastic = AsyncElasticsearch(settings.ELASTIC_URL)
     yield test_elastic
 
 
+@pytest.fixture(scope="session")
+async def test_client():
+    with TestClient(app) as client:
+        yield client
+
+
 @pytest.fixture(scope="function", autouse=True)
 async def clean_tables(test_db):
     """Clean data in all tables before running test function"""
     async with test_db.acquire() as connection:
-        async with connection.transaction():
-            await connection.execute("""TRUNCATE TABLE documents;""")
+        await connection.execute("""TRUNCATE TABLE documents;""")
 
 
 @pytest.fixture(scope="function", autouse=True)

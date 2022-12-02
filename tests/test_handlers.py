@@ -68,8 +68,8 @@ async def test_delete_document(test_db, test_elastic, test_client):
         "created_date": date_string
     }
 
-    document_id = await create_document(test_db, test_elastic, document_id=1, **document_data)
-    res = test_client.delete(f"/delete_document?document_id={document_id}")
+    await create_document(test_db, test_elastic, document_id=1, **document_data)
+    res = test_client.delete(f"/delete_document?document_id=1")
     resp = res.json()
     assert res.status_code == 200
     assert resp["success"]
@@ -85,18 +85,18 @@ async def test_delete_document(test_db, test_elastic, test_client):
         assert returned_document["text"] == text
         assert returned_document["is_deleted"]
 
-    documents_from_elastic = await test_elastic.search(index="documents", query={"match": {"Id": document_id}})
+    documents_from_elastic = await test_elastic.search(index="documents", query={"match": {"iD": document_id}})
     assert len(documents_from_elastic.body["hits"]["hits"]) == 0
 
 
-@pytest.mark.parametrize("total_doc_number_with_valid_text, total_doc_number", [
-    (10, 40),
-    (0, 40),
-    (30, 40),
-    (1, 40)
+@pytest.mark.parametrize("total_doc_number_with_valid_text, total_doc_number, expected", [
+    (10, 40, 10),
+    (0, 40, 0),
+    (30, 40, 20),
+    (1, 40, 1)
 ])
 async def test_search_text_in_documents(test_db, test_elastic, test_client,
-                                        total_doc_number_with_valid_text, total_doc_number):
+                                        total_doc_number_with_valid_text, total_doc_number, expected):
     document_data = {
         "text": "some valid text for searching",
         "rubrics": ["python", "programming", "backend"],
@@ -119,5 +119,5 @@ async def test_search_text_in_documents(test_db, test_elastic, test_client,
     resp = res.json()
     assert res.status_code == 200
     assert resp["success"]
-    assert len(resp["documents"]) == total_doc_number_with_valid_text if total_doc_number_with_valid_text <= 20 else 20
+    assert len(resp["documents"]) == expected
     assert resp["documents"] == list(sorted(deepcopy(resp["documents"]), key=lambda document: document["created_date"]))

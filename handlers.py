@@ -25,7 +25,7 @@ async def create_document(request: Request, body: InsertDocumentModel):
                        RETURNING id;"""
             document_returned_data = await connection.fetch(QUERY, body.rubrics, body.text, body.created_date)
             document_id = document_returned_data[0]["id"]
-            document = {**body.dict(), "iD": document_id}
+            document = {"iD": document_id, "text": body.text}
             await elastic.index(index="documents", document=document, refresh="wait_for")
     return {"success": True, "document_id": document_id}
 
@@ -38,7 +38,7 @@ async def delete_document(request: Request, document_id: int):
             QUERY = """UPDATE documents SET is_deleted=true WHERE id=$1 RETURNING id;"""
             document_returned_data = await connection.fetch(QUERY, document_id)
             document_id = document_returned_data[0]["id"]
-            await elastic.delete_by_query(index="documents", query={"match": {"Id": document_id}})
+            await elastic.delete_by_query(index="documents", query={"match": {"iD": document_id}})
             await elastic.indices.refresh(index="documents")
     return {"success": True, "document_id": document_id}
 

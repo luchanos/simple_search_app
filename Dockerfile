@@ -24,7 +24,4 @@ RUN python3 -m pip install --user --upgrade pip && \
 EXPOSE 8000
 
 # Execute
-CMD ["yoyo apply --database postgresql://postgres:postgres@db:5432/postgres ../migrations -b"]
 CMD ["python", "main.py"]
-# yoyo apply --database postgresql://postgres:postgres@db:5432/postgres ../migrations -b
-# yoyo apply --database postgresql://postgres:postgres@0.0.0.0:5432/postgres ../migrations -b
