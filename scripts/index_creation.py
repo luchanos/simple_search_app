@@ -1,4 +1,4 @@
-from elasticsearch import AsyncElasticsearch
+from elasticsearch import AsyncElasticsearch, BadRequestError
 from envparse import Env
 import asyncio
 
@@ -19,8 +19,11 @@ MAPPING_FOR_INDEX = {
 
 
 async def create_indexes():
-    elastic_client: AsyncElasticsearch = AsyncElasticsearch(ELASTIC_URL)
-    print(await elastic_client.indices.create(index="documents", mappings=MAPPING_FOR_INDEX))
+    async with AsyncElasticsearch(ELASTIC_URL) as elastic_client:
+        try:
+            print(await elastic_client.indices.create(index="documents", mappings=MAPPING_FOR_INDEX))
+        except BadRequestError as e:
+            print(e)
 
 
 if __name__ == "__main__":
